@@ -4,6 +4,7 @@ const TABS = [
   { to: '/', label: 'Home', icon: '🏠' },
   { to: '/weight', label: 'Weight', icon: '⚖️' },
   { to: '/waist', label: 'Waist', icon: '📏' },
+  { to: '/training', label: 'Train', icon: '💪' },
   { to: '/food', label: 'Food', icon: '🍽️' },
   { to: '/settings', label: 'Settings', icon: '⚙️' },
 ]
@@ -20,12 +21,12 @@ export default function NavBar() {
           to={tab.to}
           end={tab.to === '/'}
           className={({ isActive }) =>
-            `flex flex-col items-center gap-0.5 py-2 px-3 text-xs ${
+            `flex flex-col items-center gap-0.5 py-2 px-1.5 text-[10px] ${
               isActive ? 'text-accent' : 'text-text-dim'
             }`
           }
         >
-          <span className="text-lg leading-none">{tab.icon}</span>
+          <span className="text-base leading-none">{tab.icon}</span>
           {tab.label}
         </NavLink>
       ))}
