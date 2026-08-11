@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import WeightTracker from './pages/WeightTracker'
 import WaistTracker from './pages/WaistTracker'
+import Training from './pages/Training'
 import FoodDiary from './pages/FoodDiary'
 import FoodLibrary from './pages/FoodLibrary'
 import Settings from './pages/Settings'
@@ -30,6 +31,7 @@ function AppShell() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/weight" element={<WeightTracker />} />
         <Route path="/waist" element={<WaistTracker />} />
+        <Route path="/training" element={<Training />} />
         <Route path="/food" element={<FoodDiary />} />
         <Route path="/library" element={<FoodLibrary />} />
         <Route path="/settings" element={<Settings />} />
