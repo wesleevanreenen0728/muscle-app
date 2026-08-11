@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useFoodLog } from '../hooks/useFoodLog'
 import { useProfile } from '../hooks/useProfile'
 import { toISODate } from '../lib/dateHelpers'
 import ProgressBar from '../components/ProgressBar'
+import QuickAddFood from '../components/QuickAddFood'
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert', 'drink']
 
@@ -24,9 +26,14 @@ export default function FoodDiary() {
   const { profile } = useProfile()
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
-  const [showForm, setShowForm] = useState(false)
+  const [addMode, setAddMode] = useState(null) // null | 'library' | 'manual'
 
   const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }))
+
+  const closeAdd = () => {
+    setAddMode(null)
+    setForm(emptyForm)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -44,11 +51,15 @@ export default function FoodDiary() {
         fibre_g: Number(form.fibre_g) || 0,
         price_eur: form.price_eur ? Number(form.price_eur) : null,
       })
-      setForm(emptyForm)
-      setShowForm(false)
+      closeAdd()
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleLibraryAdd = async (item) => {
+    await addItem(item)
+    closeAdd()
   }
 
   const grouped = MEAL_TYPES.map((type) => ({
@@ -83,31 +94,46 @@ export default function FoodDiary() {
         </div>
       )}
 
-      {!showForm ? (
-        <button
-          onClick={() => setShowForm(true)}
-          className="w-full rounded-lg border border-dashed border-border text-text-dim py-3 text-sm"
-        >
-          + Add food
-        </button>
-      ) : (
+      {addMode === null && (
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setAddMode('library')}
+            className="rounded-lg border border-dashed border-accent text-accent py-3 text-sm font-medium"
+          >
+            + From food library
+          </button>
+          <button
+            onClick={() => setAddMode('manual')}
+            className="rounded-lg border border-dashed border-border text-text-dim py-3 text-sm"
+          >
+            + Enter manually
+          </button>
+        </div>
+      )}
+
+      {addMode !== null && (
+        <div className="flex gap-2 flex-wrap">
+          {MEAL_TYPES.map((type) => (
+            <button
+              type="button"
+              key={type}
+              onClick={() => setForm((f) => ({ ...f, meal_type: type }))}
+              className={`px-3 py-1.5 rounded-full text-xs capitalize border ${
+                form.meal_type === type ? 'bg-accent text-black border-accent' : 'border-border text-text-dim'
+              }`}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {addMode === 'library' && (
+        <QuickAddFood mealType={form.meal_type} onAdd={handleLibraryAdd} onCancel={closeAdd} />
+      )}
+
+      {addMode === 'manual' && (
         <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-4 space-y-3">
-          <div className="flex gap-2 flex-wrap">
-            {MEAL_TYPES.map((type) => (
-              <button
-                type="button"
-                key={type}
-                onClick={() => setForm((f) => ({ ...f, meal_type: type }))}
-                className={`px-3 py-1.5 rounded-full text-xs capitalize border ${
-                  form.meal_type === type
-                    ? 'bg-accent text-black border-accent'
-                    : 'border-border text-text-dim'
-                }`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
           <input
             required
             placeholder="Food name (e.g. Oats with milk)"
@@ -130,11 +156,7 @@ export default function FoodDiary() {
             <NumField label="Price €" value={form.price_eur} onChange={update('price_eur')} />
           </div>
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="flex-1 rounded-lg border border-border text-text py-2.5"
-            >
+            <button type="button" onClick={closeAdd} className="flex-1 rounded-lg border border-border text-text py-2.5">
               Cancel
             </button>
             <button
@@ -147,6 +169,10 @@ export default function FoodDiary() {
           </div>
         </form>
       )}
+
+      <Link to="/library" className="block text-center text-text-dim text-xs underline">
+        Manage food library
+      </Link>
 
       {loading ? (
         <p className="text-text-dim text-sm">Loading...</p>
