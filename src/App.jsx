@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import WeightTracker from './pages/WeightTracker'
 import WaistTracker from './pages/WaistTracker'
 import FoodDiary from './pages/FoodDiary'
+import FoodLibrary from './pages/FoodLibrary'
 import Settings from './pages/Settings'
 import NavBar from './components/NavBar'
 
@@ -30,6 +31,7 @@ function AppShell() {
         <Route path="/weight" element={<WeightTracker />} />
         <Route path="/waist" element={<WaistTracker />} />
         <Route path="/food" element={<FoodDiary />} />
+        <Route path="/library" element={<FoodLibrary />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
       <NavBar />
