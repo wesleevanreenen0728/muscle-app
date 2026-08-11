@@ -15,17 +15,24 @@ export function AuthProvider({ children }) {
   }, [])
 
   const signInWithEmail = async (email) => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
-    })
+    // shouldCreateUser stays true so first-time sign-in still works.
+    // No emailRedirectTo needed: we're using the 6-digit code flow, not the
+    // magic-link flow, which matters on iPhone home-screen apps (see verifyOtp).
+    const { error } = await supabase.auth.signInWithOtp({ email })
+    if (error) throw error
+  }
+
+  const verifyOtp = async (email, token) => {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
     if (error) throw error
   }
 
   const signOut = () => supabase.auth.signOut()
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, signInWithEmail, signOut }}>
+    <AuthContext.Provider
+      value={{ session, user: session?.user ?? null, signInWithEmail, verifyOtp, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   )
